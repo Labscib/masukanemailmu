@@ -6,122 +6,144 @@
 <title>Check Result</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
 
-  body {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-  }
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
 
-  .card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    padding: 2rem;
-    border-radius: 20px;
-    width: 320px;
-    text-align: center;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  }
+/* Card */
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  padding: 2rem;
+  border-radius: 20px;
+  width: 320px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
 
-  h2 {
-    margin-bottom: 1rem;
-  }
+h2 {
+  margin-bottom: 1rem;
+}
 
-  input {
-    width: 100%;
-    padding: 0.8rem;
-    border: none;
-    border-radius: 10px;
-    outline: none;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-  }
+input {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
 
-  button {
-    width: 100%;
-    padding: 0.8rem;
-    border: none;
-    border-radius: 10px;
-    background: #ffffff;
-    color: #333;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-  }
+button {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 10px;
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
-  button:hover {
-    transform: translateY(-2px);
-  }
+button:hover {
+  transform: translateY(-2px);
+}
 
-  .result {
-    margin-top: 1.5rem;
-    text-align: left;
-    font-size: 0.95rem;
-    background: rgba(255,255,255,0.15);
-    padding: 1rem;
-    border-radius: 10px;
-    display: none;
-  }
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-  .loading {
-    margin-top: 1rem;
-    display: none;
-  }
+/* Result */
+.result {
+  margin-top: 1rem;
+  background: rgba(255,255,255,0.15);
+  padding: 1rem;
+  border-radius: 10px;
+  display: none;
+}
 
-  .disclaimer {
-    position: fixed;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.7);
-    padding: 0 1rem;
-    pointer-events: none;
-    }
+/* Feedback */
+.feedback {
+  margin-top: 1.5rem;
+}
+
+#clickBtn {
+  background: #27ae60;
+  color: white;
+}
+
+#thanksMsg {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+#counter {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.count {
+  font-weight: bold;
+  color: #2ecc71;
+}
+
+/* Disclaimer */
+.disclaimer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.7);
+}
 </style>
 </head>
-<div class="disclaimer">
-  <p>Website ini adalah website tes alternatif cek lulus/tidak sebagai capsis/capmpk di sesi berkas.</p>
-  <p><b>Cara kerja:</b></p>
-  <p>Website akan mendeteksi email dan mencocokkannya dengan data.</p>
-  <p><b>Contoh:</b></p>
-  <p>Email: dafi123@gmail.com<br>
-  → Mencari kecocokan...<br>
-  → Kecocokan ditemukan<br>
-  → Menampilkan hasil</p>
-</div>
+
 <body>
 
 <div class="card">
   <h2>Check Result</h2>
+
   <input type="email" id="email" placeholder="Enter your email">
   <button onclick="check()">Check</button>
 
-  <div class="loading" id="loading">Loading...</div>
-  <div class="result" id="result"></div>
+  <div id="result" class="result"></div>
+
+  <!-- Feedback -->
+  <div class="feedback">
+    <button id="clickBtn">✅ Click if it worked!!</button>
+    <p id="thanksMsg"></p>
+    <p id="counter"><span class="count">0</span> people confirmed it worked ✅</p>
+  </div>
+</div>
+
+<div class="disclaimer">
+  Website ini adalah website tes alternatif cek lulus/tidak sebagai capsis/capmpk di sesi berkas.
 </div>
 
 <script>
 async function check() {
   const email = document.getElementById("email").value.trim();
   const resultBox = document.getElementById("result");
-  const loading = document.getElementById("loading");
 
   if (!email) {
-    alert("Please enter your email");
+    alert("Enter email first");
     return;
   }
 
-  resultBox.style.display = "none";
-  loading.style.display = "block";
+  resultBox.style.display = "block";
+  resultBox.innerHTML = "Loading...";
 
   try {
     const res = await fetch(
@@ -130,9 +152,6 @@ async function check() {
     );
 
     const data = await res.json();
-
-    loading.style.display = "none";
-    resultBox.style.display = "block";
 
     if (data.found) {
       resultBox.innerHTML = `
@@ -145,12 +164,59 @@ async function check() {
       resultBox.innerHTML = "❌ Data not found";
     }
 
-  } catch (err) {
-    loading.style.display = "none";
-    resultBox.style.display = "block";
+  } catch {
     resultBox.innerHTML = "⚠️ Error fetching data";
   }
 }
+</script>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const btn = document.getElementById("clickBtn");
+const msg = document.getElementById("thanksMsg");
+const counterEl = document.querySelector(".count");
+
+const counterRef = ref(db, "clicks");
+
+/* 🔴 LIVE COUNTER */
+onValue(counterRef, (snapshot) => {
+  const value = snapshot.val() || 0;
+  counterEl.textContent = value;
+});
+
+/* 🔒 Anti spam */
+if (localStorage.getItem("clicked")) {
+  btn.disabled = true;
+  btn.textContent = "✔️ Already clicked";
+}
+
+/* 🚀 Click */
+btn.onclick = async () => {
+  if (localStorage.getItem("clicked")) return;
+
+  await runTransaction(counterRef, (current) => {
+    return (current || 0) + 1;
+  });
+
+  localStorage.setItem("clicked", "true");
+
+  btn.disabled = true;
+  btn.textContent = "✔️ Submitted";
+  msg.textContent = "Thanks for clicking! 🎉";
+};
 </script>
 
 </body>
